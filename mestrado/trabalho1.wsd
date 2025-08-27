@@ -1,0 +1,105 @@
+@startuml ontologia
+title Ontologia (UML) – Glossário ONS: Desligamento e tipos
+left to right direction
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam ArrowColor #888888
+skinparam classBackgroundColor #FFFFFF
+
+package "Glossário ONS (recorte)" {
+
+  ' ==== CONCEITOS GERAIS ====
+  class Evento <<conceito>>
+  class SistemaDeProtecao <<artefato>>
+  class SistemaDeControle <<artefato>>
+  class Equipamento <<objeto>>
+  class Instalacao <<objeto>>
+  class Carga <<objeto>>
+  class ComponenteDeServico <<objeto>>
+  class "ONS" as OperadorNacionalDoSistema <<agente>>
+  class EmpresaProprietaria <<agente>>
+
+  enum ModoDesligamento {
+    manual
+    automatico
+  }
+
+  ' ==== CLASSE ABSTRATA ====
+  abstract class Desligamento <<evento>> {
+    +modo: ModoDesligamento [0..1]
+    +programado: Boolean [0..1]
+    +motivo: String [0..1]
+    +descricao: String [0..1]
+  }
+
+  ' ==== ESPECIALIZAÇÕES (irmãs diretas) ====
+  class DesligamentoAutomatico <<evento>> {
+    ' implica programado = false
+  }
+  class DesligamentoDeEmergencia <<evento>> {
+    ' implica programado = false
+  }
+  class DesligamentoDeUrgencia <<evento>> {
+    +antecedenciaHoras: Integer [0..1] ' <= 48
+    ' implica programado = false
+  }
+  class DesligamentoForcado <<evento>> {
+    ' programado = false
+  }
+  class DesligamentoProgramado <<evento>> {
+    ' programado = true
+  }
+
+  Desligamento <|-- DesligamentoAutomatico
+  Desligamento <|-- DesligamentoDeEmergencia
+  Desligamento <|-- DesligamentoDeUrgencia
+  Desligamento <|-- DesligamentoForcado
+  Desligamento <|-- DesligamentoProgramado
+
+  ' ==== RELAÇÕES (participação/afetação) ====
+  Desligamento "1" --> "1..*" Equipamento : afeta/desenergiza
+  Desligamento "0..1" --> "1" Instalacao : ocorre em
+  DesligamentoProgramado "0..1" --> "1" OperadorNacionalDoSistema : conforme Procedimentos de Rede
+  DesligamentoDeEmergencia "1" --> "1" EmpresaProprietaria : efetuado por
+  Desligamento "0..1" --> "0..1" Carga : pode interromper
+  DesligamentoForcado "1" --> "1" ComponenteDeServico : incide sobre
+
+  ' ==== GATILHOS / MEIOS ====
+  DesligamentoAutomatico "1" ..> SistemaDeProtecao : acionado por
+  DesligamentoAutomatico "0..1" ..> SistemaDeControle : acionado por
+
+  ' ==== NOTAS (mantendo definições do glossário) ====
+  note right of DesligamentoAutomatico
+    Retirada de operação por atuação de
+    sistema de proteção ou de controle.
+    modo = automatico
+    implica programado = false
+  end note
+
+  note right of DesligamentoDeEmergencia
+    Intempestivo (auto/manual) por falha
+    no equipamento ou na instalação.
+    implica programado = false
+  end note
+
+  note bottom of DesligamentoDeUrgencia
+    Solicitado com antecedência < 24h ou entre 24h e 48h,
+    sem ser possível ao ONS programar as condições do SIN.
+    antecedenciaHoras <= 48
+    implica programado = false
+  end note
+
+  note right of DesligamentoForcado
+    De um componente de serviço, em
+    condições não programadas.
+    programado = false
+  end note
+
+  note right of DesligamentoProgramado
+    Indisponibilidade programada de função
+    de transmissão (ou parte), conforme Procedimentos de Rede.
+    programado = true
+  end note
+}
+@enduml
