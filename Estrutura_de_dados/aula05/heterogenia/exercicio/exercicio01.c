@@ -11,14 +11,12 @@ struct mes {
 };
 
 const struct mes meses[12] = {
-    {"Janeiro", "jan", 31, 1},  {"Fevereiro", "fev", 28, 2},
-    {"Marco", "mar", 31, 3}, // (sem cedilha para coincidir com a tabela da
-                             // imagem)
-    {"Abril", "abr", 30, 4},    {"Maio", "mai", 31, 5},
-    {"Junho", "jun", 30, 6},    {"Julho", "jul", 31, 7},
-    {"Agosto", "ago", 31, 8},   {"Setembro", "set", 30, 9},
-    {"Outubro", "out", 31, 10}, {"Novembro", "nov", 30, 11},
-    {"Dezembro", "dez", 31, 12}};
+    {"Janeiro", "jan", 31, 1},     {"Fevereiro", "fev", 28, 2},
+    {"Marco", "mar", 31, 3},       {"Abril", "abr", 30, 4},
+    {"Maio", "mai", 31, 5},        {"Junho", "jun", 30, 6},
+    {"Julho", "jul", 31, 7},       {"Agosto", "ago", 31, 8},
+    {"Setembro", "set", 30, 9},    {"Outubro", "out", 31, 10},
+    {"Novembro", "nov", 30, 11},  {"Dezembro", "dez", 31, 12}};
 
 /* Comparação case-insensitive simples (ASCII) */
 static int str_ieq(const char *a, const char *b) {
