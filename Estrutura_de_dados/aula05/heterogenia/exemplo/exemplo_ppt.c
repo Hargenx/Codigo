@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-enum { MAX_NOME = 60, MAX_DATA = 11, MAX_CURSO = 40 };
+enum { MAX_NOME = 60, MAX_DATA = 12, MAX_CURSO = 40 };
 
 typedef struct {
   int matricula;

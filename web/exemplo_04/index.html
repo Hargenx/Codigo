@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Exemplo de Formulário</title>
+  </head>
+  <body style="margin:0; background:#f3f4f6; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Helvetica,Arial,'Noto Sans'; color:#111827;">
+    <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;">
+      <form action="/enviar.php" method="post"
+            style="width:100%; max-width:720px; background:#ffffff; border:1px solid #e5e7eb; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.06); padding:24px;">
+        
+        <fieldset style="border:none; margin:0; padding:0;">
+          <legend style="font-weight:700; font-size:24px; margin:0 0 16px;">Escolha seu som</legend>
+
+          <!-- Item -->
+          <label
+            onmouseover="this.style.transform='scale(1.01)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,.10)'"
+            onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(0,0,0,.06)'"
+            style="display:flex; align-items:center; gap:16px; width:100%; cursor:pointer; user-select:none;
+                   border:1px solid #e5e7eb; border-radius:12px; padding:12px; margin-bottom:12px;
+                   background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.06); transition:transform .12s ease;">
+            <input type="radio" id="Body_Count" name="grupo" value="Body_Count"
+                   style="width:20px; height:20px; margin:0 4px 0 0; accent-color:#2563eb;" />
+            <img src="./img/Body_Count.jpg" alt="Body Count"
+                 style="width:150px; height:100px; object-fit:cover; border-radius:10px; border:1px solid #e5e7eb;" />
+            <span style="font-weight:600; font-size:16px;">Body Count</span>
+          </label>
+
+          <!-- Item -->
+          <label
+            onmouseover="this.style.transform='scale(1.01)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,.10)'"
+            onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(0,0,0,.06)'"
+            style="display:flex; align-items:center; gap:16px; width:100%; cursor:pointer; user-select:none;
+                   border:1px solid #e5e7eb; border-radius:12px; padding:12px; margin-bottom:12px;
+                   background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.06); transition:transform .12s ease;">
+            <input type="radio" id="Faith_no_more" name="grupo" value="Faith_no_more"
+                   style="width:20px; height:20px; margin:0 4px 0 0; accent-color:#2563eb;" />
+            <img src="./img/Faith_no_more.jpg" alt="Faith No More"
+                 style="width:150px; height:100px; object-fit:cover; border-radius:10px; border:1px solid #e5e7eb;" />
+            <span style="font-weight:600; font-size:16px;">Faith No More</span>
+          </label>
+
+          <!-- Item -->
+          <label
+            onmouseover="this.style.transform='scale(1.01)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,.10)'"
+            onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(0,0,0,.06)'"
+            style="display:flex; align-items:center; gap:16px; width:100%; cursor:pointer; user-select:none;
+                   border:1px solid #e5e7eb; border-radius:12px; padding:12px; margin-bottom:12px;
+                   background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.06); transition:transform .12s ease;">
+            <input type="radio" id="Megadeth" name="grupo" value="Megadeth"
+                   style="width:20px; height:20px; margin:0 4px 0 0; accent-color:#2563eb;" />
+            <img src="./img/Megadeth.jpg" alt="Megadeth"
+                 style="width:150px; height:100px; object-fit:cover; border-radius:10px; border:1px solid #e5e7eb;" />
+            <span style="font-weight:600; font-size:16px;">Megadeth</span>
+          </label>
+
+          <!-- Item -->
+          <label
+            onmouseover="this.style.transform='scale(1.01)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,.10)'"
+            onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(0,0,0,.06)'"
+            style="display:flex; align-items:center; gap:16px; width:100%; cursor:pointer; user-select:none;
+                   border:1px solid #e5e7eb; border-radius:12px; padding:12px; margin-bottom:12px;
+                   background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.06); transition:transform .12s ease;">
+            <input type="radio" id="soundgarden" name="grupo" value="Soundgarden"
+                   style="width:20px; height:20px; margin:0 4px 0 0; accent-color:#2563eb;" />
+            <img src="./img/SoundGarden.jpg" alt="Soundgarden"
+                 style="width:150px; height:100px; object-fit:cover; border-radius:10px; border:1px solid #e5e7eb;" />
+            <span style="font-weight:600; font-size:16px;">Soundgarden</span>
+          </label>
+        </fieldset>
+
+        <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:12px;">
+          <button type="reset"
+                  style="padding:10px 16px; border:1px solid #e5e7eb; background:#fff; color:#111827; border-radius:10px; cursor:pointer;">
+            Limpar
+          </button>
+          <button type="submit"
+                  style="padding:10px 16px; border:none; background:#2563eb; color:#fff; border-radius:10px; cursor:pointer;">
+            Enviar
+          </button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
