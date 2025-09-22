@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aula CSS3 – Fontes, Responsividade e Reaproveitamento</title>
+
+    <!-- Tópico 5: Fontes e Harmonização (Google Fonts) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ===============================
+       Tópico 7: Reaproveitamento e Manutenção
+       - Variáveis CSS, escalas e tokens de design
+       =============================== */
+      :root {
+        /* Cores */
+        --color-bg: #0f172a; /* slate-900 */
+        --color-surface: #111827; /* gray-900 */
+        --color-elev: #1f2937; /* gray-800 */
+        --color-primary: #60a5fa; /* blue-400 */
+        --color-primary-strong: #3b82f6; /* blue-500 */
+        --color-text: #e5e7eb; /* gray-200 */
+        --color-text-dim: #9ca3af; /* gray-400 */
+        --color-accent: #22d3ee; /* cyan-400 */
+
+        /* Tipografia */
+        --font-heading: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
+          "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+        --font-body: "Roboto", system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
+          "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+
+        /* Escalas */
+        --radius-sm: 8px;
+        --radius-md: 14px;
+        --radius-lg: 22px;
+
+        --space-1: 8px;
+        --space-2: 12px;
+        --space-3: 16px;
+        --space-4: 24px;
+        --space-5: 32px;
+        --space-6: 48px;
+
+        --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.25);
+        --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.35);
+        --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.45);
+
+        --container-max: 1100px;
+      }
+
+      /* Reset mínimo e padrões de tipografia/hierarquia (Tópico 5) */
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: radial-gradient(
+            1200px 800px at 80% -10%,
+            rgba(96, 165, 250, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            900px 500px at -10% 10%,
+            rgba(34, 211, 238, 0.08),
+            transparent 60%
+          ),
+          var(--color-bg);
+        color: var(--color-text);
+        font-family: var(--font-body);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: var(--font-heading);
+        line-height: 1.25;
+        margin: 0 0 var(--space-3);
+      }
+      h1 {
+        font-size: clamp(2rem, 4vw, 2.75rem);
+        font-weight: 600;
+      }
+      h2 {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 600;
+      }
+      p {
+        margin: 0 0 var(--space-3);
+        color: var(--color-text);
+      }
+      .muted {
+        color: var(--color-text-dim);
+      }
+
+      /* Contêiner utilitário (reaproveitável) */
+      .container {
+        width: min(100% - 2rem, var(--container-max));
+        margin-inline: auto;
+      }
+
+      /* Botões reutilizáveis (BEM) */
+      .btn {
+        display: inline-block;
+        padding: 10px 18px;
+        border-radius: var(--radius-md);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .btn--primary {
+        background: var(--color-primary-strong);
+        color: white;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.15s ease, box-shadow 0.2s ease,
+          background 0.2s ease;
+      }
+      .btn--primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        background: var(--color-primary);
+      }
+      .btn--ghost {
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: var(--color-text);
+      }
+
+      /* ===============================
+       Cabeçalho (Flexbox – Tópico 6)
+       =============================== */
+      header.site-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        -webkit-backdrop-filter: saturate(1.2) blur(10px);
+        backdrop-filter: saturate(1.2) blur(10px);
+        background: linear-gradient(
+          to right,
+          rgba(17, 24, 39, 0.75),
+          rgba(31, 41, 55, 0.75)
+        );
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        padding: var(--space-3) 0;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: var(--color-text);
+      }
+      .brand__logo {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(
+          135deg,
+          var(--color-primary),
+          var(--color-accent)
+        );
+        box-shadow: var(--shadow-sm);
+        font-weight: 700;
+      }
+      .brand__name {
+        font-family: var(--font-heading);
+        font-weight: 600;
+        letter-spacing: 0.4px;
+      }
+
+      .menu {
+        display: flex;
+        gap: var(--space-3);
+        align-items: center;
+      }
+      .menu a {
+        color: var(--color-text-dim);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .menu a:hover {
+        color: var(--color-text);
+      }
+
+      /* Ação do menu em telas pequenas */
+      .menu-toggle {
+        display: none;
+      }
+
+      /* ===============================
+       Hero / Destaque (Grid + Flex – Tópico 6)
+       =============================== */
+      .hero {
+        padding: var(--space-6) 0;
+      }
+      .hero__grid {
+        display: grid;
+        gap: var(--space-5);
+        align-items: center;
+      }
+      .hero__card {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.03),
+          rgba(255, 255, 255, 0.02)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        padding: clamp(18px, 3vw, 28px);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+      }
+      .hero__actions {
+        display: flex;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+        margin-top: var(--space-3);
+      }
+      .hero__accent {
+        color: var(--color-accent);
+        font-weight: 600;
+      }
+
+      /* ===============================
+       Seção: Fontes (Tópico 5 – harmonização)
+       =============================== */
+      .fonts {
+        padding: var(--space-6) 0;
+      }
+      .fonts__grid {
+        display: grid;
+        gap: var(--space-4);
+      }
+      .font-card {
+        background: var(--color-elev);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius-lg);
+        padding: var(--space-4);
+        box-shadow: var(--shadow-sm);
+      }
+      .font-card__title {
+        font-family: var(--font-heading);
+      }
+      .font-card__sample {
+        font-size: clamp(1rem, 2.2vw, 1.125rem);
+      }
+
+      .fonts .pairing {
+        display: grid;
+        gap: var(--space-3);
+      }
+      .pairing__h {
+        font-family: var(--font-heading);
+        font-weight: 600;
+      }
+      .pairing__p {
+        font-family: var(--font-body);
+      }
+
+      /* ===============================
+       Seção: Responsividade (Tópico 6 – grid responsivo)
+       =============================== */
+      .features {
+        padding: var(--space-6) 0;
+      }
+      .features__grid {
+        display: grid;
+        gap: var(--space-4);
+      }
+      .feature {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.03),
+          rgba(255, 255, 255, 0.02)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius-lg);
+        padding: var(--space-4);
+        box-shadow: var(--shadow-sm);
+      }
+      .feature__title {
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      .feature__p {
+        color: var(--color-text-dim);
+      }
+
+      /* ===============================
+       Seção: Reaproveitamento (Tópico 7 – tokens aplicados)
+       =============================== */
+      .reuso {
+        padding: var(--space-6) 0;
+      }
+      .token-demo {
+        display: grid;
+        gap: var(--space-4);
+        grid-template-columns: 1fr;
+      }
+      .token-demo__card {
+        background: var(--color-elev);
+        padding: var(--space-4);
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow: var(--shadow-sm);
+      }
+      .swatch {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        vertical-align: middle;
+        margin-right: 8px;
+      }
+
+      /* Rodapé */
+      footer {
+        padding: var(--space-6) 0;
+        color: var(--color-text-dim);
+        text-align: center;
+      }
+
+      /* ===================================
+       Media Queries – Mobile-first (Tópico 6)
+       =================================== */
+      @media (min-width: 640px) {
+        .hero__grid {
+          grid-template-columns: 1.2fr 1fr;
+        }
+        .fonts__grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .features__grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .token-demo {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (min-width: 960px) {
+        .features__grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      /* Navegação responsiva (hamburger simples) */
+      @media (max-width: 800px) {
+        .menu {
+          display: none;
+        }
+        .menu-toggle {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 12px;
+          border-radius: var(--radius-sm);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          color: var(--color-text);
+          background: transparent;
+        }
+        .menu-toggle[aria-expanded="true"] + .menu {
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-2);
+          padding: var(--space-3) 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Cabeçalho (Flexbox) -->
+    <header class="site-header">
+      <div class="container nav">
+        <a href="#" class="brand" aria-label="Início">
+          <span class="brand__logo">CSS</span>
+          <span class="brand__name">Aula CSS3</span>
+        </a>
+
+        <button
+          class="menu-toggle"
+          aria-controls="menu"
+          aria-expanded="false"
+          onclick="toggleMenu(this)"
+        >
+          ☰ Menu
+        </button>
+        <nav id="menu" class="menu" aria-label="Principal">
+          <a href="#fontes">Fontes</a>
+          <a href="#responsivo">Responsividade</a>
+          <a href="#reuso">Reaproveitamento</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- HERO / Destaque -->
+    <section class="hero">
+      <div class="container hero__grid">
+        <div class="hero__card">
+          <h1>
+            CSS3 com foco em
+            <span class="hero__accent">engenharia de software</span>
+          </h1>
+          <p class="muted">
+            Separação de preocupações, componentes reutilizáveis, tokens de
+            design e layouts responsivos.
+          </p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="#responsivo">Ver exemplos</a>
+            <a class="btn btn--ghost" href="#reuso">Tokens de design</a>
+          </div>
+        </div>
+        <div class="hero__card" aria-hidden="true">
+          <h2 style="margin-top: 0">Visuais consistentes</h2>
+          <p>
+            Este cartão demonstra sombra, raio e bordas reutilizados. Mude
+            apenas os valores das variáveis para re-tematizar.
+          </p>
+          <p class="muted">
+            Tokens aplicados: <code>--radius-lg</code>,
+            <code>--shadow-md</code>, <code>--color-elev</code>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tópico 5: Fontes e harmonização -->
+    <section id="fontes" class="fonts container">
+      <h2>Harmonização de Fontes</h2>
+      <p class="muted">
+        Títulos em <strong>Poppins</strong> e corpo em
+        <strong>Roboto</strong> criam contraste e legibilidade.
+      </p>
+
+      <div class="fonts__grid">
+        <article class="font-card">
+          <h3 class="font-card__title">Poppins (títulos)</h3>
+          <p class="font-card__sample" style="font-family: var(--font-heading)">
+            “Tipografia é a voz visual do conteúdo.”
+          </p>
+          <p class="muted">Uso recomendado: headings, highlights e botões.</p>
+        </article>
+
+        <article class="font-card">
+          <h3 class="font-card__title">Roboto (corpo)</h3>
+          <p class="font-card__sample" style="font-family: var(--font-body)">
+            Leitura confortável em parágrafos e textos longos.
+          </p>
+          <p class="muted">Uso recomendado: parágrafos e descrições.</p>
+        </article>
+
+        <article class="font-card pairing" style="grid-column: 1 / -1">
+          <h3 class="pairing__h">Exemplo de Pareamento</h3>
+          <p class="pairing__p">
+            Este parágrafo demonstra o corpo do texto. Repare no contraste de
+            peso e altura-x entre as fontes.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Tópico 6: Responsividade (Grid, mobile-first) -->
+    <section id="responsivo" class="features container">
+      <h2>Layout Responsivo</h2>
+      <p class="muted">
+        Grid fluido e media queries: em telas menores, 1 coluna; em telas
+        médias, 2; em grandes, 3.
+      </p>
+
+      <div class="features__grid">
+        <article class="feature">
+          <h3 class="feature__title">Mobile-first</h3>
+          <p class="feature__p">
+            Estilize para telas pequenas primeiro e adicione
+            <code>@media</code> para ampliar.
+          </p>
+        </article>
+        <article class="feature">
+          <h3 class="feature__title">Flex + Grid</h3>
+          <p class="feature__p">
+            Use Flexbox para alinhamentos locais e Grid para o layout macro da
+            página.
+          </p>
+        </article>
+        <article class="feature">
+          <h3 class="feature__title">Unidades fluídas</h3>
+          <p class="feature__p">
+            Combine <code>%</code>, <code>vw</code>, <code>vh</code>,
+            <code>rem</code> para maior adaptabilidade.
+          </p>
+        </article>
+        <article class="feature">
+          <h3 class="feature__title">Tipografia responsiva</h3>
+          <p class="feature__p">
+            Use <code>clamp()</code> para escalonar títulos e parágrafos.
+          </p>
+        </article>
+        <article class="feature">
+          <h3 class="feature__title">Navegação adaptativa</h3>
+          <p class="feature__p">
+            O menu vira “hamburger” em telas estreitas automaticamente.
+          </p>
+        </article>
+        <article class="feature">
+          <h3 class="feature__title">Performance</h3>
+          <p class="feature__p">
+            Evite CSS redundante; reutilize tokens e classes utilitárias.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Tópico 7: Reaproveitamento e manutenção (variáveis e utilitários) -->
+    <section id="reuso" class="reuso container">
+      <h2>Reaproveitamento com Tokens de Design</h2>
+      <p class="muted">
+        Mude as variáveis em <code>:root</code> para alterar tema, espaçamentos
+        e raios globalmente.
+      </p>
+
+      <div class="token-demo">
+        <article class="token-demo__card">
+          <h3>Paleta</h3>
+          <p>
+            <span class="swatch" style="background: var(--color-primary)"></span
+            >Primária
+          </p>
+          <p>
+            <span class="swatch" style="background: var(--color-accent)"></span
+            >Accent
+          </p>
+          <p>
+            <span class="swatch" style="background: var(--color-elev)"></span
+            >Superfície
+          </p>
+        </article>
+        <article class="token-demo__card">
+          <h3>Componentes Reutilizáveis</h3>
+          <p>
+            Botões compartilham raio, sombra e tipografia. Um tema novo exige
+            apenas trocar variáveis.
+          </p>
+          <div
+            style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px"
+          >
+            <a class="btn btn--primary" href="#">Chamar Ação</a>
+            <a class="btn btn--ghost" href="#">Secundário</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer>
+      <div class="container">
+        <p>
+          Exemplo didático para os Tópicos 5, 6 e 7 e a
+          <strong>melhor resposta do Exercício 8</strong> (landing page
+          responsiva com boas práticas).
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      // Navegação responsiva simples
+      function toggleMenu(btn) {
+        const expanded = btn.getAttribute("aria-expanded") === "true";
+        btn.setAttribute("aria-expanded", String(!expanded));
+      }
+    </script>
+  </body>
+</html>
