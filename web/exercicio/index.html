@@ -1,0 +1,59 @@
+<!--header, nav, main, section, article/section para cards, footer.
+
+img com alt="Nome da empresa" (ou alt="" se decorativa).
+
+Menus como lista: nav > ul > li > a.
+
+Hierarquia: h1 (“Sobre nós”), h2 nos cards.
+
+A11y extra típico: lang="pt-BR" no html, meta charset, skip link (a[href="#main"]), contraste, foco visível.-->
+
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sobre nós — Empresa</title>
+</head>
+<body>
+  <a href="#conteudo-principal">Pular para o conteúdo principal</a>
+  <header>
+    <div class="logo">
+      <a href="/" aria-label="Página inicial">
+        <img src="logo.png" alt="Empresa" height="150" width="150">
+      </a>
+    </div>
+
+    <nav aria-label="Navegação principal">
+      <ul>
+        <li><a href="/" aria-current="page">Home</a></li>
+        <li><a href="/blog">Blog</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="conteudo-principal" tabindex="-1">
+    <header>
+      <h1>Sobre nós</h1>
+    </header>
+
+    <p>Somos uma empresa...</p>
+
+    <section class="cards" aria-label="Seções institucionais">
+      <article class="card">
+        <h2 class="card__title">Missão</h2>
+        <p class="card__text">Texto</p>
+      </article>
+
+      <article class="card">
+        <h2 class="card__title">Visão</h2>
+        <p class="card__text">Texto</p>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025</p>
+  </footer>
+</body>
+</html>
