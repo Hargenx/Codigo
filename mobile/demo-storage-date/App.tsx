@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  SafeAreaView,
   View,
   Text,
   TextInput,
@@ -12,6 +11,7 @@ import {
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
@@ -61,7 +61,8 @@ function safeParse<T>(raw: string | null, fallback: T): T {
 // 3) Reusable AsyncStorage hook (typed) --------------------------------------
 
 function useAsyncStorageItem<T>(key: string, initial: T) {
-  const [value, setValue] = useState<T>(initial);
+  const initialRef = useRef(initial);
+  const [value, setValue] = useState<T>(initialRef.current as T);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -69,24 +70,20 @@ function useAsyncStorageItem<T>(key: string, initial: T) {
     setLoading(true);
     try {
       const raw = await AsyncStorage.getItem(key);
-      setValue(safeParse<T>(raw, initial));
+      setValue(safeParse<T>(raw, initialRef.current as T));
       setError(null);
     } catch (e) {
       setError(e as Error);
     } finally {
       setLoading(false);
     }
-  }, [key, initial]);
+  }, [key]);
 
   const save = useCallback(
     async (next: T | ((prev: T) => T)) => {
-      // Compute next state synchronously, persist in background
       setValue((prev) => {
-        const out =
-          typeof next === "function" ? (next as (p: T) => T)(prev) : next;
-        AsyncStorage.setItem(key, safeStringify(out)).catch((e) =>
-          setError(e as Error)
-        );
+        const out = typeof next === "function" ? (next as (p: T) => T)(prev) : next;
+        AsyncStorage.setItem(key, safeStringify(out)).catch((e) => setError(e as Error));
         return out;
       });
     },
@@ -96,12 +93,12 @@ function useAsyncStorageItem<T>(key: string, initial: T) {
   const clear = useCallback(async () => {
     try {
       await AsyncStorage.removeItem(key);
-      setValue(initial);
+      setValue(initialRef.current as T);
       setError(null);
     } catch (e) {
       setError(e as Error);
     }
-  }, [key, initial]);
+  }, [key]);
 
   useEffect(() => {
     refresh();
@@ -137,9 +134,10 @@ export default function App() {
   });
 
   // Selected date (ISO)
+  const initialDateISO = useRef(new Date().toISOString()).current;
   const selectedDate = useAsyncStorageItem<string>(
     STORAGE_KEYS.SELECTED_DATE_ISO,
-    new Date().toISOString()
+    initialDateISO
   );
 
   // Log list
@@ -147,9 +145,10 @@ export default function App() {
 
   const addLog = useCallback(
     (message: string) =>
-      log.save((prev) =>
-        [{ id: uid(), ts: nowISO(), message }, ...prev].slice(0, 200)
-      ),
+      log.save((prev) => [
+        { id: uid(), ts: nowISO(), message },
+        ...prev,
+      ].slice(0, 200)),
     [log]
   );
 
@@ -162,9 +161,7 @@ export default function App() {
       if (date && (type === undefined || type === "set")) {
         const iso = date.toISOString();
         selectedDate.save(iso);
-        addLog(
-          `Data selecionada: ${formatDateBR(iso)} (ISO: ${iso.slice(0, 10)})`
-        );
+        addLog(`Data selecionada: ${formatDateBR(iso)} (ISO: ${iso.slice(0, 10)})`);
       } else if (type === "dismissed") {
         addLog("Seleção de data cancelada");
       }
@@ -184,14 +181,19 @@ export default function App() {
   }, [profile, addLog]);
 
   const clearAll = useCallback(async () => {
-    await Promise.all([profile.clear(), selectedDate.clear(), log.clear()]);
+    await Promise.all([
+      profile.clear(),
+      selectedDate.clear(),
+      log.clear(),
+    ]);
     addLog("Storage limpo (perfil, data, log)");
   }, [profile, selectedDate, log, addLog]);
 
   const anyLoading = profile.loading || selectedDate.loading || log.loading;
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
         <Text style={styles.h1}>AsyncStorage + DatePicker + Log</Text>
 
@@ -229,16 +231,11 @@ export default function App() {
         {/* DATE SECTION */}
         <Section title="Data selecionada">
           <Text style={styles.mono}>
-            {formatDateBR(selectedDate.value)} — ISO:{" "}
-            {selectedDate.value.slice(0, 10)}
+            {formatDateBR(selectedDate.value)} — ISO: {selectedDate.value.slice(0, 10)}
           </Text>
           <View style={styles.row}>
             <Btn title="Escolher data" onPress={() => setShowPicker(true)} />
-            <Btn
-              title="Hoje"
-              variant="ghost"
-              onPress={() => onChangeDate({} as any, new Date())}
-            />
+            <Btn title="Hoje" variant="ghost" onPress={() => onChangeDate({} as any, new Date())} />
           </View>
           {showPicker && (
             <DateTimePicker
@@ -254,16 +251,7 @@ export default function App() {
         {/* ACTIONS */}
         <Section title="Ações do Storage">
           <View style={styles.row}>
-            <Btn
-              title="Recarregar tudo"
-              variant="ghost"
-              onPress={() => {
-                profile.refresh();
-                selectedDate.refresh();
-                log.refresh();
-                addLog("Refresh manual executado");
-              }}
-            />
+            <Btn title="Recarregar tudo" variant="ghost" onPress={() => { profile.refresh(); selectedDate.refresh(); log.refresh(); addLog("Refresh manual executado"); }} />
             <Btn title="Limpar tudo" variant="danger" onPress={clearAll} />
           </View>
         </Section>
@@ -271,11 +259,7 @@ export default function App() {
         {/* LOG SECTION */}
         <Section title={`Log (${log.value.length})`}>
           <View style={[styles.row, { marginBottom: 8 }]}>
-            <Btn
-              title="Adicionar linha de teste"
-              variant="ghost"
-              onPress={() => addLog("Linha de teste adicionada")}
-            />
+            <Btn title="Adicionar linha de teste" variant="ghost" onPress={() => addLog("Linha de teste adicionada")}/>
             <Btn title="Limpar log" variant="danger" onPress={log.clear} />
           </View>
 
@@ -286,15 +270,11 @@ export default function App() {
             contentContainerStyle={{ paddingBottom: 8 }}
             renderItem={({ item }) => (
               <View style={styles.logItem}>
-                <Text style={styles.logTs}>
-                  {new Date(item.ts).toLocaleTimeString("pt-BR")}
-                </Text>
+                <Text style={styles.logTs}>{new Date(item.ts).toLocaleTimeString("pt-BR")}</Text>
                 <Text style={styles.logMsg}>{item.message}</Text>
               </View>
             )}
-            ListEmptyComponent={
-              <Text style={{ opacity: 0.6 }}>Sem eventos ainda.</Text>
-            }
+            ListEmptyComponent={<Text style={{ opacity: 0.6 }}>Sem eventos ainda.</Text>}
           />
         </Section>
 
@@ -302,37 +282,22 @@ export default function App() {
         {(profile.error || selectedDate.error || log.error) && (
           <View style={styles.errorBox}>
             <Text style={styles.errorTitle}>Erros</Text>
-            {profile.error && (
-              <Text style={styles.errorText}>
-                Perfil: {String(profile.error.message || profile.error)}
-              </Text>
-            )}
-            {selectedDate.error && (
-              <Text style={styles.errorText}>
-                Data: {String(selectedDate.error.message || selectedDate.error)}
-              </Text>
-            )}
-            {log.error && (
-              <Text style={styles.errorText}>
-                Log: {String(log.error.message || log.error)}
-              </Text>
-            )}
+            {profile.error && <Text style={styles.errorText}>Perfil: {String(profile.error.message || profile.error)}</Text>}
+            {selectedDate.error && <Text style={styles.errorText}>Data: {String(selectedDate.error.message || selectedDate.error)}</Text>}
+            {log.error && <Text style={styles.errorText}>Log: {String(log.error.message || log.error)}</Text>}
           </View>
         )}
       </View>
     </SafeAreaView>
+  )}
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
 // 6) UI helpers ---------------------------------------------------------------
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View style={styles.section}>
       <Text style={styles.h2}>{title}</Text>
@@ -361,18 +326,12 @@ function Btn({
         pressed && { opacity: 0.75 },
       ]}
     >
-      <Text
-        style={[styles.btnText, variant !== "solid" && styles.btnTextGhost]}
-      >
-        {title}
-      </Text>
+      <Text style={[styles.btnText, variant !== "solid" && styles.btnTextGhost]}>{title}</Text>
     </Pressable>
   );
 }
 
-function LabeledInput(
-  props: React.ComponentProps<typeof TextInput> & { label: string }
-) {
+function LabeledInput(props: React.ComponentProps<typeof TextInput> & { label: string }) {
   const { label, style, ...rest } = props;
   return (
     <View style={{ marginBottom: 12 }}>
@@ -414,10 +373,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#1f2937",
   },
-  mono: {
-    fontFamily: Platform.select({ ios: "Menlo", android: "monospace" }) as any,
-    color: "#cbd5e1",
-  },
+  mono: { fontFamily: Platform.select({ ios: "Menlo", android: "monospace" }) as any, color: "#cbd5e1" },
   row: { flexDirection: "row", gap: 10, alignItems: "center" },
   rowCenter: { flexDirection: "row", alignItems: "center" },
   btn: {
