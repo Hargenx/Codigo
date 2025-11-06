@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5.20.1"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "data": {"name": "data-004ef49c3e58821193bd6f22150c0321"}, "mark": {"type": "bar"}, "encoding": {"tooltip": [{"field": "T\u00edtulo do Cargo", "type": "nominal"}, {"field": "M\u00e9dia de Sal\u00e1rio", "type": "quantitative"}], "x": {"field": "M\u00e9dia de Sal\u00e1rio", "type": "quantitative"}, "y": {"field": "T\u00edtulo do Cargo", "sort": "-x", "type": "nominal"}}, "height": 350, "params": [{"name": "param_2", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales"}], "title": "M\u00e9dia de Sal\u00e1rio por T\u00edtulo do Cargo", "width": 700, "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json", "datasets": {"data-004ef49c3e58821193bd6f22150c0321": [{"T\u00edtulo do Cargo": "Analista", "M\u00e9dia de Sal\u00e1rio": 1700.0}, {"T\u00edtulo do Cargo": "Assistente", "M\u00e9dia de Sal\u00e1rio": 1500.0}, {"T\u00edtulo do Cargo": "Diretor", "M\u00e9dia de Sal\u00e1rio": 2500.0}, {"T\u00edtulo do Cargo": "Estagi\u00e1rio", "M\u00e9dia de Sal\u00e1rio": 600.0}, {"T\u00edtulo do Cargo": "Gerente", "M\u00e9dia de Sal\u00e1rio": 2050.0}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>
