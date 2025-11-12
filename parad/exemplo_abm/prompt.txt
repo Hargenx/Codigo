@@ -1,0 +1,21 @@
+Tem como fazer um exemplo simples para criar um ABM simples para explicar o funcionamento de ABM para alunos de primeiro periodo, quero algo que seja modular, que use bibliotecas NumPy e Matplotlib e o que mais for necessário, além de seguir as seguinte regras:
+
+A taberna fica aberta de 16pm até as 02am;
+Há 2 cozinheiros um homem e uma mulher, além de 4 atendentes mulheres, 2 seguranças homens e 2 gerentes, um homem e uma mulher, que são um casal de donos do estabelecimento;
+O menu varia por cozinheiro;
+O menu tem uns 18 pratos, 22 bebidas diferentes, sendo 14 alcoólicas;
+O espaço onde fica a taberna é um sobrado de 2 andares, onde o primeiro andar fica o salão com 6 mesas comportando até 6 pessoas, além de 12 cadeiras altas no balcão, o segundo andar tem 4 dormitórios individuais e 4 coletivos para até 4 pessoas;
+A taberna pode ter no máximo 8 pessoas em pé, ou ficara superlotada;
+Os seguranças e gerentes controlam o fluxo de pessoas, o número pode passar um pouco caso necessário, mas não pode extrapolar;
+O fluxo de pessoas varia de acordo com o horário;
+
+Os agentes:
+Tem atributos como força, reflexo, constituição, agilidade, velocidade, que podem ser afetados pelo que bebem e comem;
+Tem dinheiro que usam para pagar sua conta ao fechar;
+Podem ser furtados;
+Podem furtar;
+Podem brigar entre si;
+Bêbados podem causar confusão e terão que ser expulsos;
+Se houver alguem morto, a taberna fecha para chegada da policia, que pode levar um tempo para chegar;
+
+Se achar valido novas regras pode acrescentar, mas a ideia é ser algo simples e direto, para apresentação de ABM para turma.
