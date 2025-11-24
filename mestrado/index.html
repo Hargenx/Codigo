@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MercadoLab: Um Framework Baseado em Agentes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Merriweather:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+/* 1. SETUP GERAL */
+* { box-sizing: border-box; }
+
+body {
+  background-color: #e2e8f0;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+  min-height: 100vh;
+  padding: 20px 0;
+  place-items: center;
+  margin: 0;
+}
+
+.slide-container {
+  background-color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  font-family: "DM Sans", sans-serif;
+  height: 720px;
+  width: 1280px;
+  overflow: hidden;
+  padding: 50px 60px;
+  position: relative;
+  border-radius: 8px;
+}
+
+/* 2. TIPOGRAFIA */
+h1 {
+  font-family: "Merriweather", serif;
+  font-weight: 700;
+  font-size: 64px;
+  line-height: 1.1;
+  margin: 0 0 20px 0;
+  color: #1e293b;
+}
+
+h2.slide-title {
+  font-family: "Merriweather", serif;
+  font-size: 42px;
+  color: #0f172a;
+  margin: 0 0 40px 0;
+  border-bottom: 3px solid #005088;
+  padding-bottom: 15px;
+  display: inline-block;
+  width: 100%;
+}
+
+h3 {
+  font-family: "Merriweather", serif;
+  font-size: 24px;
+  color: #005088;
+  margin: 0 0 15px 0;
+}
+
+p, li {
+  font-size: 20px;
+  line-height: 1.6;
+  color: #334155;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 28px;
+  color: #64748b;
+  font-weight: 400;
+}
+
+/* 3. LAYOUTS */
+.content-area {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.two-column {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 60px;
+  align-items: center;
+  height: 100%;
+}
+
+.two-column.equal {
+    grid-template-columns: 1fr 1fr;
+}
+
+.two-column.tiled {
+    align-items: stretch;
+}
+
+.two-column.tiled > div {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 30px;
+}
+
+/* Visualizações CSS (Substituindo Imagens) */
+.css-viz-container {
+    width: 100%;
+    height: 350px;
+    background-color: #f1f5f9;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #cbd5e1;
+}
+
+/* Viz: Network (Sistemas Complexos) */
+.viz-network { position: relative; width: 300px; height: 300px; }
+.node {
+    position: absolute;
+    background-color: #005088;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.line {
+    position: absolute;
+    background-color: #cbd5e1;
+    height: 2px;
+    transform-origin: 0 0;
+}
+
+/* Viz: Bar Chart */
+.viz-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    height: 200px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #64748b;
+}
+.bar {
+    width: 40px;
+    background: linear-gradient(to top, #005088, #3b82f6);
+    border-radius: 4px 4px 0 0;
+    position: relative;
+}
+.bar::after {
+    content: attr(data-val);
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Viz: Order Book */
+.viz-orderbook {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    gap: 2px;
+}
+.ob-row {
+    display: flex;
+    height: 30px;
+    margin-bottom: 2px;
+}
+.ob-side {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: bold;
+}
+.ob-ask { background-color: #fca5a5; justify-content: flex-start; border-radius: 0 4px 4px 0; color: #7f1d1d; }
+.ob-bid { background-color: #86efac; justify-content: flex-end; border-radius: 4px 0 0 4px; color: #14532d; }
+.ob-price { width: 60px; text-align: center; background: #e2e8f0; font-size: 12px; line-height: 30px;}
+
+/* Viz: Target/Bullseye */
+.viz-target {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 20px solid;
+}
+.c1 { width: 250px; height: 250px; border-color: #e2e8f0; }
+.c2 { width: 170px; height: 170px; border-color: #94a3b8; }
+.c3 { width: 90px; height: 90px; background-color: #005088; border: none; }
+
+/* Tiled Content Grid */
+.grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 25px;
+    width: 100%;
+}
+.grid-tile {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.grid-tile .icon-box {
+    width: 60px;
+    height: 60px;
+    background-color: #f0f9ff;
+    color: #005088;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin: 0 auto 15px auto;
+}
+
+/* Timeline */
+.timeline {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-top: 50px;
+}
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #e2e8f0;
+    z-index: 0;
+}
+.tl-item {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    width: 20%;
+}
+.tl-dot {
+    width: 40px;
+    height: 40px;
+    background: #005088;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    margin: 0 auto 15px auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+.tl-content h4 { margin: 0; color: #005088; }
+.tl-content p { font-size: 16px; margin-top: 5px; }
+
+/* Table */
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+th { background-color: #f1f5f9; color: #0f172a; font-weight: 700; text-align: left; padding: 15px; border-bottom: 2px solid #cbd5e1; }
+td { padding: 15px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+tr:last-child td { border: none; }
+
+    </style>
+</head>
+<body>
+
+<!-- Slide 1: Capa -->
+<div class="slide-container" style="background: linear-gradient(135deg, #005088 0%, #1e293b 100%); color: white;">
+    <div class="content-area" style="align-items: flex-start;">
+        <div style="background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; margin-bottom: 30px;">
+            <p style="margin: 0; font-size: 16px; font-weight: 700; color: #e2e8f0; text-transform: uppercase; letter-spacing: 1px;">Universidade Federal do Rio de Janeiro (UFRJ)</p>
+        </div>
+        
+        <h1 style="color: white; font-size: 58px; margin-bottom: 20px;">Um Framework Baseado em Agentes para Simulação de Investimentos</h1>
+        <p class="subtitle" style="color: #cbd5e1; font-size: 24px; margin-bottom: 60px;">Projeto de Pesquisa - Mestrado em Informática (PPGI)</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 5px; border-left: 4px solid #38bdf8; padding-left: 20px;">
+            <p style="font-size: 26px; font-weight: 700; color: white; margin: 0 0 10px 0;">Raphael Mauricio Sanches de Jesus</p>
+            <div style="display: grid; gap: 4px;">
+                <p style="margin: 0; font-size: 18px; color: #94a3b8;"><strong>Orientador:</strong> Prof. Ph.D. Eber Assis Schmitz</p>
+                <p style="margin: 0; font-size: 18px; color: #94a3b8;"><strong>Coorientador:</strong> Prof. DSc. Sildenir Alves Ribeiro</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 2: Agenda -->
+<div class="slide-container">
+    <h2 class="slide-title">Agenda</h2>
+    <div class="grid-3" style="grid-template-columns: repeat(5, 1fr); gap: 15px;">
+        <div class="grid-tile">
+            <div class="icon-box"><i class="fa-solid fa-list-ul"></i></div>
+            <h4 style="margin: 10px 0;">Introdução</h4>
+            <p style="font-size: 14px;">Contexto e Problema</p>
+        </div>
+        <div class="grid-tile">
+            <div class="icon-box"><i class="fa-solid fa-book-open"></i></div>
+            <h4 style="margin: 10px 0;">Fundamentação</h4>
+            <p style="font-size: 14px;">ABM e Ontologia</p>
+        </div>
+        <div class="grid-tile">
+            <div class="icon-box"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+            <h4 style="margin: 10px 0;">RSL</h4>
+            <p style="font-size: 14px;">Estado da Arte</p>
+        </div>
+        <div class="grid-tile">
+            <div class="icon-box"><i class="fa-solid fa-code"></i></div>
+            <h4 style="margin: 10px 0;">Framework</h4>
+            <p style="font-size: 14px;">Arquitetura</p>
+        </div>
+        <div class="grid-tile">
+            <div class="icon-box"><i class="fa-solid fa-calendar"></i></div>
+            <h4 style="margin: 10px 0;">Cronograma</h4>
+            <p style="font-size: 14px;">Próximos Passos</p>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 3: Contexto -->
+<div class="slide-container">
+    <h2 class="slide-title">Contextualização: Sistemas Complexos</h2>
+    <div class="two-column">
+        <div>
+            <h3>Mercados Financeiros</h3>
+            <p>São <strong>sistemas adaptativos complexos</strong>. Fenômenos como volatilidade e <em>crashes</em> não são exógenos, mas emergem da interação de milhares de agentes.</p>
+            <ul style="margin-top: 20px;">
+                <li><strong>Não-linearidade:</strong> Pequenos choques podem causar grandes efeitos.</li>
+                <li><strong>Heterogeneidade:</strong> Agentes têm estratégias e informações diferentes.</li>
+                <li><strong>Modelagem Bottom-up:</strong> A simulação baseada em agentes (ABM) reconstrói o macro a partir do micro.</li>
+            </ul>
+        </div>
+        <div class="css-viz-container">
+            <!-- CSS Network Graph Representation -->
+            <div class="viz-network">
+                <!-- Lines -->
+                <div class="line" style="width: 100px; top: 50px; left: 50px; transform: rotate(20deg);"></div>
+                <div class="line" style="width: 80px; top: 50px; left: 50px; transform: rotate(70deg);"></div>
+                <div class="line" style="width: 120px; top: 150px; left: 100px; transform: rotate(-30deg);"></div>
+                <div class="line" style="width: 90px; top: 150px; left: 100px; transform: rotate(45deg);"></div>
+                <!-- Nodes -->
+                <div class="node" style="width: 20px; height: 20px; top: 40px; left: 40px;"></div>
+                <div class="node" style="width: 25px; height: 25px; top: 80px; left: 140px;"></div>
+                <div class="node" style="width: 15px; height: 15px; top: 140px; left: 90px;"></div>
+                <div class="node" style="width: 22px; height: 22px; top: 200px; left: 50px;"></div>
+                <div class="node" style="width: 30px; height: 30px; top: 180px; left: 180px;"></div>
+            </div>
+            <p style="position: absolute; bottom: 10px; font-size: 14px; color: #64748b;">Rede de Interações de Agentes</p>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 4: Problema -->
+<div class="slide-container">
+    <h2 class="slide-title">O Problema de Pesquisa</h2>
+    <div class="two-column equal">
+        <div style="padding-right: 20px;">
+            <p>Existe uma <strong>lacuna tecnológica</strong> entre modelos teóricos de finanças e ferramentas de simulação disponíveis.</p>
+            <div style="background: #fff1f2; border-left: 4px solid #e11d48; padding: 15px; margin: 20px 0;">
+                <p style="font-size: 18px; margin: 0; color: #be123c;"><strong>Problema Central:</strong> Falta de frameworks que combinem microestrutura realista (LOB) com reprodutibilidade rigorosa e extensibilidade.</p>
+            </div>
+            <p>Muitos estudos atuais usam códigos <em>ad-hoc</em>, difíceis de validar ou estender com novas estratégias de IA.</p>
+        </div>
+        <div class="css-viz-container" style="flex-direction: column; background: white; border: none;">
+            <h4 style="margin-bottom: 30px; color: #334155;">Comparativo de Ferramentas Existentes</h4>
+            <div class="viz-chart">
+                <div class="bar" style="height: 60px; background: #cbd5e1;" data-val="Baixa"></div>
+                <div class="bar" style="height: 80px; background: #cbd5e1;" data-val="Média"></div>
+                <div class="bar" style="height: 160px;" data-val="Alta"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; width: 180px; margin-top: 10px; font-size: 12px; color: #64748b; font-weight: bold;">
+                <span>Teóricos</span>
+                <span>Ad-Hoc</span>
+                <span style="color: #005088;">Proposto</span>
+            </div>
+            <p style="margin-top: 20px; font-size: 16px;">Nível de Realismo e Reuso</p>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 5: Conceitos -->
+<div class="slide-container">
+    <h2 class="slide-title">Fundamentação: Pilares do Framework</h2>
+    <div class="grid-3">
+        <div class="grid-tile">
+            <h3>Agentes (ABM)</h3>
+            <p style="font-size: 16px;">Entidades autônomas. Cada investidor possui estado (carteira, crenças) e comportamento próprio, decidindo comprar ou vender com base em regras ou IA.</p>
+        </div>
+        <div class="grid-tile">
+            <h3>Engenharia de Software</h3>
+            <p style="font-size: 16px;">Uso de Padrões de Projeto (Strategy, Observer) e Inversão de Controle para garantir que o framework seja extensível sem modificar seu núcleo.</p>
+        </div>
+        <div class="grid-tile">
+            <h3>Microestrutura</h3>
+            <p style="font-size: 16px;">Modelagem fiel do mecanismo de formação de preços: o Livro de Ordens Limite (LOB) e o algoritmo de casamento contínuo.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 6: Ontologia -->
+<div class="slide-container">
+    <h2 class="slide-title">Ontologia de Domínio (OntoUML)</h2>
+    <div class="two-column tiled">
+        <div>
+            <h3><i class="fa-solid fa-cube"></i> Conceitos Rígidos (Kinds)</h3>
+            <ul style="font-size: 18px;">
+                <li><strong>Investidor:</strong> O agente econômico.</li>
+                <li><strong>Instrumento:</strong> O ativo financeiro (ex: Ação).</li>
+                <li><strong>Mercado:</strong> O ambiente de negociação.</li>
+            </ul>
+        </div>
+        <div>
+            <h3><i class="fa-solid fa-link"></i> Relatores e Eventos</h3>
+            <ul style="font-size: 18px;">
+                <li><strong>Ordem:</strong> Intenção de compra/venda (Limit/Market).</li>
+                <li><strong>Transação:</strong> O evento de troca efetiva.</li>
+                <li><strong>Papel (Role):</strong> Trader (ao emitir ordem).</li>
+            </ul>
+        </div>
+    </div>
+    <p style="margin-top: 20px; font-size: 16px; color: #64748b; text-align: center;">A modelagem ontológica garante a coerência semântica das classes do software.</p>
+</div>
+
+<!-- Slide 7: RSL Protocolo -->
+<div class="slide-container">
+    <h2 class="slide-title">Revisão Sistemática (RSL)</h2>
+    <div class="two-column">
+        <div>
+            <p>Protocolo baseado nas diretrizes <strong>PRISMA</strong>.</p>
+            <ul style="font-size: 18px;">
+                <li><strong>Fontes:</strong> Scopus, IEEE Xplore, Web of Science.</li>
+                <li><strong>Janela:</strong> 2012 - 2024.</li>
+                <li><strong>Keywords:</strong> <code>ABM</code> + <code>Financial Market</code> + <code>Simulation</code>.</li>
+            </ul>
+            <p>O foco foi identificar trabalhos que priorizassem a <strong>reprodutibilidade</strong> do código e a validação com dados reais.</p>
+        </div>
+        <div class="css-viz-container" style="background: white; border: none;">
+            <!-- Simple Flow Diagram -->
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                <div style="border: 2px solid #94a3b8; padding: 10px 20px; border-radius: 6px;">Busca (N=145)</div>
+                <div style="width: 2px; height: 20px; background: #94a3b8;"></div>
+                <div style="border: 2px solid #94a3b8; padding: 10px 20px; border-radius: 6px;">Filtragem (N=26)</div>
+                <div style="width: 2px; height: 20px; background: #94a3b8;"></div>
+                <div style="background: #005088; color: white; padding: 10px 20px; border-radius: 6px; font-weight: bold;">Seleção Final (N=10)</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 8: RSL Resultados -->
+<div class="slide-container">
+    <h2 class="slide-title">Lacunas Identificadas na Literatura</h2>
+    <div class="grid-3" style="grid-template-columns: 1fr 1fr;">
+        <div class="grid-tile" style="text-align: left;">
+            <h3 style="color: #be123c;"><i class="fa-solid fa-xmark"></i> O que falta</h3>
+            <ul>
+                <li><strong>Reprodutibilidade:</strong> Maioria dos artigos não publica o código fonte ou configurações de sementes (seeds).</li>
+                <li><strong>Microestrutura:</strong> Modelos simplificados que ignoram o spread bid-ask real.</li>
+            </ul>
+        </div>
+        <div class="grid-tile" style="text-align: left; background-color: #f0f9ff; border-color: #bae6fd;">
+            <h3 style="color: #0369a1;"><i class="fa-solid fa-check"></i> Nossa Proposta</h3>
+            <ul>
+                <li><strong>Open Source:</strong> Código aberto e documentado.</li>
+                <li><strong>Controle Total:</strong> Serviço de sementes determinísticas para garantir repetição exata.</li>
+                <li><strong>LOB Completo:</strong> Simulação realista de filas de ordens.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 9: Proposito -->
+<div class="slide-container">
+    <h2 class="slide-title">Propósito da Pesquisa</h2>
+    <div class="two-column">
+        <div style="display: flex; justify-content: center;">
+            <div class="viz-target">
+                <div class="circle c1"></div>
+                <div class="circle c2"></div>
+                <div class="circle c3"></div>
+                <i class="fa-solid fa-crosshairs" style="position: absolute; font-size: 40px; color: white; z-index: 10;"></i>
+            </div>
+        </div>
+        <div>
+            <h3>Objetivo Geral</h3>
+            <p>Desenvolver e validar o <strong>MercadoLab</strong>: um ambiente virtual para experimentação financeira.</p>
+            <h3>Validação</h3>
+            <p>O sucesso será medido pela capacidade do simulador de replicar <strong>Fatos Estilizados</strong> (Stylized Facts) universais, como:</p>
+            <ul>
+                <li>Caudas pesadas na distribuição de retornos.</li>
+                <li>Aglomeração de volatilidade (Volatility Clustering).</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 10: Framework Arquitetura -->
+<div class="slide-container">
+    <h2 class="slide-title">MercadoLab: Arquitetura Modular</h2>
+    <div class="grid-3">
+        <div class="grid-tile">
+            <div class="icon-box" style="background-color: #e0e7ff; color: #4338ca;"><i class="fa-solid fa-cogs"></i></div>
+            <h3>Core Runtime</h3>
+            <p style="font-size: 15px;">Controla o ciclo de vida da simulação (Ticks), gerenciamento de tempo e orquestração de eventos.</p>
+        </div>
+        <div class="grid-tile">
+            <div class="icon-box" style="background-color: #dcfce7; color: #15803d;"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+            <h3>Matching Engine</h3>
+            <p style="font-size: 15px;">O motor de bolsa. Recebe ordens, gerencia o Livro de Ofertas e executa casamentos de preço.</p>
+        </div>
+        <div class="grid-tile">
+            <div class="icon-box" style="background-color: #ffedd5; color: #c2410c;"><i class="fa-solid fa-users"></i></div>
+            <h3>Agentes</h3>
+            <p style="font-size: 15px;">Classes base para investidores, com suporte a plugins de estratégia (Zero Intelligence, RL, Trend Following).</p>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 11: Componentes -->
+<div class="slide-container">
+    <h2 class="slide-title">Infraestrutura de Suporte</h2>
+    <div class="two-column tiled">
+        <div>
+            <h3><i class="fa-solid fa-database"></i> Persistência e Dados</h3>
+            <p>Sistema desacoplado para gravação de dados.</p>
+            <ul>
+                <li><strong>Storage Agnostic:</strong> Salva em CSV, JSON ou Banco de Dados.</li>
+                <li><strong>Event Bus:</strong> Componentes se comunicam via eventos (ex: <code>OrderPlaced</code>, <code>TradeExecuted</code>) para evitar dependência direta.</li>
+            </ul>
+        </div>
+        <div>
+            <h3><i class="fa-solid fa-fingerprint"></i> Seed Service</h3>
+            <p>Garante a reprodutibilidade científica.</p>
+            <ul>
+                <li><strong>Singleton:</strong> Gerenciador central de aleatoriedade.</li>
+                <li><strong>Hierarquia:</strong> Cada agente recebe uma semente derivada da semente mestre, garantindo que a simulação X sempre gere o resultado Y.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 12: Microestrutura -->
+<div class="slide-container">
+    <h2 class="slide-title">Microestrutura: Livro de Ordens (LOB)</h2>
+    <div class="two-column">
+        <div>
+            <p>Implementação fiel da mecânica de <strong>Preço-Tempo</strong>.</p>
+            <ul>
+                <li><strong>Ordens a Limite:</strong> Entram na fila do LOB.</li>
+                <li><strong>Ordens a Mercado:</strong> Consumem liquidez imediata.</li>
+            </ul>
+            <p style="font-size: 16px; color: #64748b; margin-top: 20px;">Prioridade de execução: <br>1. Melhor Preço <br>2. Chegada mais antiga (FIFO)</p>
+        </div>
+        <div class="css-viz-container" style="background: white; flex-direction: column;">
+            <h4 style="margin-bottom: 10px;">Visualização LOB</h4>
+            <div class="viz-orderbook">
+                <div class="ob-row"><div class="ob-side ob-ask" style="width: 30%;">Venda 100</div><div class="ob-price">10.55</div><div class="ob-side"></div></div>
+                <div class="ob-row"><div class="ob-side ob-ask" style="width: 50%;">Venda 200</div><div class="ob-price">10.52</div><div class="ob-side"></div></div>
+                <div class="ob-row"><div class="ob-side ob-ask" style="width: 40%;">Venda 150</div><div class="ob-price">10.51</div><div class="ob-side"></div></div>
+                
+                <div style="height: 2px; background: #cbd5e1; margin: 5px 0;"></div>
+                
+                <div class="ob-row"><div class="ob-side"></div><div class="ob-price">10.49</div><div class="ob-side ob-bid" style="width: 60%;">Compra 300</div></div>
+                <div class="ob-row"><div class="ob-side"></div><div class="ob-price">10.48</div><div class="ob-side ob-bid" style="width: 20%;">Compra 50</div></div>
+                <div class="ob-row"><div class="ob-side"></div><div class="ob-price">10.45</div><div class="ob-side ob-bid" style="width: 40%;">Compra 150</div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 13: Fluxo -->
+<div class="slide-container">
+    <h2 class="slide-title">Ciclo de Execução (O Tick)</h2>
+    <div class="timeline">
+        <div class="tl-item">
+            <div class="tl-dot">1</div>
+            <div class="tl-content">
+                <h4>Clock</h4>
+                <p>Avanço do tempo discreto.</p>
+            </div>
+        </div>
+        <div class="tl-item">
+            <div class="tl-dot">2</div>
+            <div class="tl-content">
+                <h4>Agentes</h4>
+                <p>Observam estado e emitem ordens.</p>
+            </div>
+        </div>
+        <div class="tl-item">
+            <div class="tl-dot">3</div>
+            <div class="tl-content">
+                <h4>Engine</h4>
+                <p>Processa o LOB e casa ordens.</p>
+            </div>
+        </div>
+        <div class="tl-item">
+            <div class="tl-dot">4</div>
+            <div class="tl-content">
+                <h4>Clearing</h4>
+                <p>Atualiza carteiras e saldos.</p>
+            </div>
+        </div>
+        <div class="tl-item">
+            <div class="tl-dot">5</div>
+            <div class="tl-content">
+                <h4>Log</h4>
+                <p>Persiste dados e notifica eventos.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 14: Cronograma -->
+<div class="slide-container">
+    <h2 class="slide-title">Cronograma e Status</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Fase</th>
+                <th>Atividade</th>
+                <th>Semestre</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>1. Concepção</strong></td>
+                <td>Definição do problema e RSL</td>
+                <td>2024.1</td>
+                <td><span style="color: #15803d; font-weight: bold;">Concluído</span></td>
+            </tr>
+            <tr>
+                <td><strong>2. Modelagem</strong></td>
+                <td>Ontologia e Arquitetura</td>
+                <td>2024.2</td>
+                <td><span style="color: #15803d; font-weight: bold;">Concluído</span></td>
+            </tr>
+            <tr style="background-color: #eff6ff;">
+                <td><strong>3. Implementação</strong></td>
+                <td>Codificação do Framework (Python)</td>
+                <td>2025.1</td>
+                <td><span style="color: #0369a1; font-weight: bold;">Em Andamento</span></td>
+            </tr>
+            <tr>
+                <td><strong>4. Validação</strong></td>
+                <td>Simulações e Análise de Dados</td>
+                <td>2025.2</td>
+                <td><span style="color: #64748b;">Planejado</span></td>
+            </tr>
+            <tr>
+                <td><strong>5. Defesa</strong></td>
+                <td>Escrita final e apresentação</td>
+                <td>2026.1</td>
+                <td><span style="color: #64748b;">Planejado</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Slide 15: Encerramento -->
+<div class="slide-container" style="background: linear-gradient(135deg, #0f172a 0%, #334155 100%); color: white; justify-content: center; text-align: center;">
+    <h2 style="font-size: 64px; margin-bottom: 20px; color: white; border: none;">Obrigado!</h2>
+    <p style="font-size: 24px; color: #cbd5e1;">Perguntas?</p>
+</div>
+
+</body>
+</html>
